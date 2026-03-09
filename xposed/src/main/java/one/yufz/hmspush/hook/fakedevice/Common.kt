@@ -3,6 +3,7 @@ package one.yufz.hmspush.hook.fakedevice
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import one.yufz.hmspush.hook.XLog
 import one.yufz.xposed.hookMethod
+import miui.os.Build as MiuiBuild
 import miui.external.SdkHelper
 
 open class Common : IFakeDevice {
@@ -14,6 +15,7 @@ open class Common : IFakeDevice {
         XLog.d(TAG, "fake() called with: packageName = ${lpparam.packageName}")
         fakeAllBuildInProperties()
         fakeClass(lpparam)
+        FakeXmsfPackage.hook(lpparam)
         return true
     }
 
@@ -30,7 +32,7 @@ open class Common : IFakeDevice {
         }
 
         val classMap: Map<String, Class<out Any>> = mapOf(
-            "miui.os.Build" to Object::class.java,
+            MiuiBuild::class.java.name to MiuiBuild::class.java,
             SdkHelper::class.java.name to SdkHelper::class.java,
         )
         Class::class.java.hookMethod(
