@@ -117,7 +117,7 @@ object HookPushNC {
             String::class.java,
             String::class.java
         ) {
-            replace() {
+            replace(hookCheck) {
                 tryInvoke {
                     return@replace SystemNotificationManager.getNotificationChannel(
                         args[0] as String,
