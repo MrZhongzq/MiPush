@@ -2,7 +2,11 @@ name: Android CI
 
 on:
   push:
+    branches:
+      - npatch-integration
   pull_request:
+    branches:
+      - npatch-integration
   workflow_dispatch:
 
 permissions:
@@ -25,14 +29,14 @@ jobs:
         distribution: 'adopt'
         cache: gradle
 
-    - name: Write key
+    - name: Write signing key
       run: |
-        if [ ! -z "${{ secrets.SIGNING_KEY }}" ]; then
+        if [ ! -z "${{ secrets.KEY_STORE }}" ]; then
           echo STORE_PASSWORD='${{ secrets.KEY_STORE_PASSWORD }}' >> local.properties
           echo KEY_ALIAS='${{ secrets.ALIAS }}' >> local.properties
           echo KEY_PASSWORD='${{ secrets.KEY_PASSWORD }}' >> local.properties
           echo STORE_FILE_PATH='../release.keystore' >> local.properties
-          echo ${{ secrets.SIGNING_KEY }} | base64 --decode > release.keystore
+          echo '${{ secrets.KEY_STORE }}' | base64 --decode > release.keystore
         fi
 
     - name: Git describe
@@ -71,6 +75,7 @@ jobs:
         echo "version=$version" >> $GITHUB_OUTPUT
 
     - name: Release
+      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/npatch-integration'
       uses: softprops/action-gh-release@v2
       with:
         name: ${{ steps.gvn.outputs.version }}
